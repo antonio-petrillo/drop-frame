@@ -19,10 +19,9 @@
 ;;
 ;;; Code:
 
-;; TODO: to remove, when loaded with require lexical binding will be automatically enabled
-(setq lexical-binding t)
-
 (defvar previous-focus nil)
+
+(defvar drop-frame-table (make-hash-table :test 'equal))
 
 (defclass drop-frame ()
   ((name :initarg :name
@@ -85,32 +84,29 @@
             ((frame-visible-p fr) (hide a-frame))
             (:else (show a-frame))))))
 
-(setq my-example (make-instance drop-frame
-                          :name "drop down example"
-                          :height 600
-                          :width 900
-                          :top 0
-                          :left 300
-                          :setup-fn (lambda () (switch-to-buffer (get-buffer-create "drop-frame.el")))))
+(cl-defun define-new-drop-frame (name setup-fn
+                                     &optional
+                                      key
+                                     (height 600)
+                                     (width 900)
+                                     (top 0)
+                                     (left 300))
+  (let* ((new-frame (drop-frame :name name
+                                :setup-fn setup-fn
+                                :height height
+                                :width width
+                                :left left
+                                :top top))
+         (proper-name (replace-regexp-in-string "\\s-+" "-" name))
+         (toggle-fn (intern (concat proper-name "-toggle"))))
+     (progn
+      (puthash proper-name new-frame drop-frame-table)
+       (fset toggle-fn `(lambda ()
+                          (interactive)
+                          (toggle ,new-frame)))
+       (if key
+           (global-set-key key toggle-fn)))))
 
-(setq my-term (make-instance drop-frame
-                          :name "drop down terminal"
-                          :height 600
-                          :width 900
-                          :top 0
-                          :left 300
-                          :setup-fn (lambda ()
-                                      (progn
-                                        (switch-to-buffer (get-buffer-create "drop-down term"))
-                                        (eshell)))))
-
-(create my-example)
-(toggle my-example)
-(hide my-example)
-(show my-example)
-
-(global-set-key (kbd "C-c o e") (lambda () (interactive) (toggle my-example)))
-(global-set-key (kbd "C-c o t") (lambda () (interactive) (toggle my-term)))
 
 (provide 'drop-frame)
 ;;; drop-frame.el ends here
