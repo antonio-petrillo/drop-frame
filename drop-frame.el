@@ -21,8 +21,7 @@
 
 (defvar previous-focus nil)
 
-(defvar drop-frame-table (make-hash-table :test 'equal))
-
+;;;###autoload
 (defclass drop-frame ()
   ((name :initarg :name
          :type string
@@ -30,44 +29,31 @@
          :documentation "drop-frame name")
    (frame :type frame
           :documentation "drop-frame frame")
-   (height :initarg :height
-           :initform 600
-           :type integer
-           :documentation "drop-frame frame")
-   (width :initarg :width
-           :initform 900
-           :type integer
-           :documentation "drop-frame frame")
-   (left :initarg :left
-           :initform 300
-           :type integer
-           :documentation "drop-frame frame")
-   (top :initarg :top
-           :initform 0
-           :type integer
-           :documentation "drop-frame frame")
-   (setup-fn :initarg :setup-fn
-             :type function
-             :documentation "drop-frame setup function")))
+   (frame-params :type list
+                 :initform '()
+                 :initarg :frame-params
+                 :documentation "drop-frame frame parameters")
+   (setup-fns :initarg :setup-fns
+             :type list
+             :documentation "drop-frame setup functions")))
 
+;;;###autoload
 (cl-defmethod create ((a-frame drop-frame))
   (let ((focus (selected-frame))
-        (fr (make-frame (list (cons 'name (oref a-frame name))
-                              (cons 'left (oref a-frame left))
-                              (cons 'top (oref a-frame top))
-                              (cons 'height (cons 'text-pixels (oref a-frame height)))
-                              (cons 'width (cons 'text-pixels (oref a-frame width)))))))
+        (fr (make-frame (oref a-frame frame-params))))
         (progn
           (setq previous-focus focus)
           (oset a-frame frame fr)
-          (funcall (oref a-frame setup-fn)))))
+          (mapc #'funcall (oref a-frame setup-fns)))))
 
+;;;###autoload
 (cl-defmethod show ((a-frame drop-frame))
   "toggle the drop-frame"
   (progn
     (setq previous-focus (selected-frame))
     (make-frame-visible (oref a-frame frame))))
 
+;;;###autoload
 (cl-defmethod hide ((a-frame drop-frame))
   "toggle the drop-frame"
   (progn
@@ -75,8 +61,8 @@
     (setq previous-focus nil)
     (make-frame-invisible (oref a-frame frame) t)))
 
-(cl-defmethod toggle ((a-frame drop-frame))
-  (interactive)
+;;;###autoload
+(cl-defmethod -toggle ((a-frame drop-frame))
   (if (not (slot-boundp a-frame 'frame))
       (create a-frame)
     (let ((fr (oref a-frame frame)))
@@ -84,29 +70,11 @@
             ((frame-visible-p fr) (hide a-frame))
             (:else (show a-frame))))))
 
-(cl-defun define-new-drop-frame (name setup-fn
-                                     &optional
-                                      key
-                                     (height 600)
-                                     (width 900)
-                                     (top 0)
-                                     (left 300))
-  (let* ((new-frame (drop-frame :name name
-                                :setup-fn setup-fn
-                                :height height
-                                :width width
-                                :left left
-                                :top top))
-         (proper-name (replace-regexp-in-string "\\s-+" "-" name))
-         (toggle-fn (intern (concat proper-name "-toggle"))))
-     (progn
-      (puthash proper-name new-frame drop-frame-table)
-       (fset toggle-fn `(lambda ()
-                          (interactive)
-                          (toggle ,new-frame)))
-       (if key
-           (global-set-key key toggle-fn)))))
-
+;;;###autoload
+(defun toggle (a-frame)
+  (lambda ()
+    (interactive)
+    (toggle a-frame)))
 
 (provide 'drop-frame)
 ;;; drop-frame.el ends here
