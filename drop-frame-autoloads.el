@@ -20,7 +20,7 @@
 ;;; Code:
 
 (add-to-list 'load-path (or (and load-file-name (directory-file-name (file-name-directory load-file-name))) (car load-path)))
-(autoload 'drop-frame "drop-frame" "drop frame" t)
+(autoload 'drop-frame "drop-frame" "drop frame" nil t)
 
 (provide 'drop-frame-autoloads)
 ;;; drop-frame-autoloads.el ends here
