@@ -19,7 +19,7 @@
 ;;
 ;;; Code:
 
-(defvar previous-focus nil)
+(defvar drop-frame--previous-focus nil)
 
 ;;;###autoload
 (defclass drop-frame ()
@@ -38,43 +38,43 @@
              :documentation "drop-frame setup functions")))
 
 ;;;###autoload
-(cl-defmethod create ((a-frame drop-frame))
+(cl-defmethod drop-frame--create ((a-frame drop-frame))
   (let ((focus (selected-frame))
         (fr (make-frame (oref a-frame frame-params))))
         (progn
-          (setq previous-focus focus)
+          (setq drop-frame--previous-focus focus)
           (oset a-frame frame fr)
           (mapc #'funcall (oref a-frame setup-fns)))))
 
 ;;;###autoload
-(cl-defmethod show ((a-frame drop-frame))
+(cl-defmethod drop-frame--show ((a-frame drop-frame))
   "toggle the drop-frame"
   (progn
-    (setq previous-focus (selected-frame))
+    (setq drop-frame--previous-focus (selected-frame))
     (make-frame-visible (oref a-frame frame))))
 
 ;;;###autoload
-(cl-defmethod hide ((a-frame drop-frame))
+(cl-defmethod drop-frame--hide ((a-frame drop-frame))
   "toggle the drop-frame"
   (progn
-    (select-frame-set-input-focus previous-focus)
-    (setq previous-focus nil)
+    (select-frame-set-input-focus drop-frame--previous-focus)
+    (setq drop-frame--previous-focus nil)
     (make-frame-invisible (oref a-frame frame) t)))
 
 ;;;###autoload
-(cl-defmethod -toggle ((a-frame drop-frame))
+(cl-defmethod drop-frame--toggle-private ((a-frame drop-frame))
   (if (not (slot-boundp a-frame 'frame))
-      (create a-frame)
+      (drop-frame--create a-frame)
     (let ((fr (oref a-frame frame)))
-      (cond ((or (not fr) (not (frame-live-p fr))) (create a-frame))
-            ((frame-visible-p fr) (hide a-frame))
-            (:else (show a-frame))))))
+      (cond ((or (not fr) (not (frame-live-p fr))) (drop-frame--create a-frame))
+            ((frame-visible-p fr) (drop-frame--hide a-frame))
+            (:else (drop-frame--show a-frame))))))
 
 ;;;###autoload
-(defun toggle (a-frame)
+(defun drop-frame--toggle (a-frame)
   (lambda ()
     (interactive)
-    (toggle a-frame)))
+    (drop-frame--toggle-private a-frame)))
 
 (provide 'drop-frame)
 ;;; drop-frame.el ends here

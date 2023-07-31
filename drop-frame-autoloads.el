@@ -20,7 +20,13 @@
 ;;; Code:
 
 (add-to-list 'load-path (or (and load-file-name (directory-file-name (file-name-directory load-file-name))) (car load-path)))
-(autoload 'drop-frame "drop-frame" "drop frame" nil t)
+
+(autoload 'drop-frame "drop-frame" "drop frame" nil nil)
+(autoload 'drop-frame--create "drop-frame" "drop frame" nil nil)
+(autoload 'drop-frame--show "drop-frame" "drop frame" nil nil)
+(autoload 'drop-frame--hide "drop-frame" "drop frame" nil nil)
+(autoload 'drop-frame--toggle-private "drop-frame" "drop frame" nil nil)
+(autoload 'drop-frame--toggle "drop-frame" "drop frame" nil nil)
 
 (provide 'drop-frame-autoloads)
 ;;; drop-frame-autoloads.el ends here
