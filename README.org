@@ -1,3 +1,78 @@
 #+title: Readme
 
 * Drop down frames
+This is a simple package to manage emacs frame and made them behave like [[https://apps.kde.org/en-gb/yakuake/][Yakuake]] (drop down terminal), another similar package is [[e][yequake]].
+I've implemented my own version because I didn't like how /yequake/ manage the /hide/ and /show/ state.
+* Signature
+#+begin_src elisp
+(drop-frame--create NAME BUFFER-FNS &optional FRAME-PARAMS)
+#+end_src
+** Description
++ NAME: drop frame name.
++ BUFFER-FNS: *list* of functions to setup the frame when it gets created.
++ FRAME-PARAMS: *alist* of frame parameters, like position, size, transparency, etc.
++ RETURN-VALUE: returns a *function* that when called /toggle/ the /drop frame/ between the /show/ and /hide/ state.
+* Example
+** Drop down terminal
+#+begin_src elisp
+(setq drop-term
+      (drop-frame--create
+       "term"
+       '(eshell)
+       '((top . 0)
+         (left . 335)
+         (cons 'width (cons 'text-pixels 800))
+         (cons 'height (cons 'text-pixels 400)))))
+
+(global-set-key (kbd "C-c o t") drop-term)
+#+end_src
+** Drop down your doctor
+:PROPERTIES:
+:ORDERED:  t
+:END:
+Don't take this too literally.
+#+begin_src elisp
+(setq drop-doctor
+      (drop-frame--create
+       "doctor"
+       '(doctor)
+       '((top . 278)
+         (left . 335)
+         (height . 20)
+         (width . 80))))
+
+(global-set-key (kbd "C-c o d") drop-doctor)
+#+end_src
+** Drop down grid
+As a [[https://github.com/doomemacs/doomemacs][Doom Emacs]] I use ~map!~ to bind the key.
+#+begin_src elisp
+(setq drop-grid-with-shell
+      (drop-frame--create
+       "grid with shell"
+       '(split-window-horizontally
+         split-window-below
+         eshell)
+       '((top . 278)
+         (left . 335)
+         (height . 40)
+         (width . 60)
+         (minibuffer . nil))))
+
+;;(global-set-key (kbd "C-c o g") drop-grid-with-shell)
+
+(map! :leader
+      (:prefix ("d" . "drop frames")
+       :desc "drop grid with shell" "g" drop-grid-with-shell))
+#+end_src
+* Things to improve
+** Improve the my elisp-fu
+This is my first attempt at write a package, I'm not sure that the quality and convention can meet the standard of the Emacs community.
+** Improve the return value of ~drop-frame--create~
+As you can see in the examples the return value must be stored into a var and the binded to a key, this approach seems a little bit unnatural, of course you can bind directly the result to a key but this seems even more ugly and uncorrect to me.
+*** A possible solution
+Let the function return ~nil~ and define inside ~drop-frame--create~ a function like ~frame-name--toggle~.
+** Frame Params
+As it is now, if you want to define a new frame, you have to specify at a very low level the /position/ and the /size/ of the frame which is really unconvenient.
+Maybe I should define some predefined position like /top-center/, /left-side/, /center/, etc.
+** My English
+People says it is a little bit funky and I agree with them.
