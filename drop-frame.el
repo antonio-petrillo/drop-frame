@@ -41,13 +41,14 @@
       (drop-frame--hide a-frame)
     (drop-frame--show a-frame)))
 
-;; SEE: yequake
+;; SEE: yequake => yequake--show-buffers
 (defun drop-frame--act (setup-action)
   "Function used to setupe a new drop frame with the given actions, stolen from yequake"
   (cl-typecase setup-action
-    (string (or (get-buffer setup-action)
-                (find-buffer-visiting setup-action)
-                (find-file-noselect setup-action)))
+    (string (switch-to-buffer
+             (or (get-buffer setup-action)
+                 (find-buffer-visiting setup-action)
+                 (find-file-noselect setup-action))))
     (function (funcall setup-action))))
 
 ;;;###autoload

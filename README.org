@@ -26,10 +26,7 @@ I've implemented my own version because I didn't like how /yequake/ manage the /
 
 (global-set-key (kbd "C-c o t") drop-term)
 #+end_src
-** Drop down your doctor
-:PROPERTIES:
-:ORDERED:  t
-:END:
+** Drop down doctor
 Don't take this too literally.
 #+begin_src elisp
 (setq drop-doctor
@@ -44,7 +41,7 @@ Don't take this too literally.
 (global-set-key (kbd "C-c o d") drop-doctor)
 #+end_src
 ** Drop down grid
-As a [[https://github.com/doomemacs/doomemacs][Doom Emacs]] I use ~map!~ to bind the key.
+As a [[https://github.com/doomemacs/doomemacs][Doom Emacs]] user here an example with ~map!~ to bind the toggle function.
 #+begin_src elisp
 (setq drop-grid-with-shell
       (drop-frame--create
@@ -58,14 +55,12 @@ As a [[https://github.com/doomemacs/doomemacs][Doom Emacs]] I use ~map!~ to bind
          (width . 60)
          (minibuffer . nil))))
 
-;;(global-set-key (kbd "C-c o g") drop-grid-with-shell)
-
 (map! :leader
       (:prefix ("d" . "drop frames")
        :desc "drop grid with shell" "g" drop-grid-with-shell))
 #+end_src
 * Things to improve
-** Improve the my elisp-fu
+** Improve my elisp-fu
 This is my first attempt at write a package, I'm not sure that the quality and convention can meet the standard of the Emacs community.
 ** Improve the return value of ~drop-frame--create~
 As you can see in the examples the return value must be stored into a var and the binded to a key, this approach seems a little bit unnatural, of course you can bind directly the result to a key but this seems even more ugly and uncorrect to me.
@@ -74,5 +69,7 @@ Let the function return ~nil~ and define inside ~drop-frame--create~ a function 
 ** Frame Params
 As it is now, if you want to define a new frame, you have to specify at a very low level the /position/ and the /size/ of the frame which is really unconvenient.
 Maybe I should define some predefined position like /top-center/, /left-side/, /center/, etc.
+** Spawn on monitor
+As it is now the frame spawn only on the primary screen, if you have a multiple screen you can't choose on which screen spawn the drop frames.
 ** My English
 People says it is a little bit funky and I agree with them.
